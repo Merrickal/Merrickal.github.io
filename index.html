@@ -2,116 +2,171 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Download My App</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My App</title>
 
-  <!-- Google Font -->
+<link rel="icon" href="icon.png">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
-    }
+<style>
+body {
+  margin:0;
+  font-family:Poppins;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  text-align:center;
+}
 
-    body {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
+.container {
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
 
-    .container {
-      max-width: 400px;
-      padding: 30px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(15px);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
+.logo {
+  width:90px;
+  border-radius:20px;
+  margin:20px 0;
+}
 
-    .logo {
-      width: 90px;
-      height: 90px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
+button {
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#6366f1;
+  color:white;
+  font-size:16px;
+  margin-top:10px;
+}
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
+.carousel {
+  display:flex;
+  overflow-x:auto;
+  gap:10px;
+  margin-top:20px;
+}
 
-    p {
-      font-size: 14px;
-      color: #cbd5f5;
-      margin-bottom: 25px;
-    }
+.carousel img {
+  width:200px;
+  border-radius:12px;
+}
 
-    .download-btn {
-      display: inline-block;
-      padding: 14px 25px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      color: white;
-      text-decoration: none;
-      transition: 0.3s ease;
-      box-shadow: 0 5px 20px rgba(99,102,241,0.4);
-    }
-
-    .download-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(99,102,241,0.6);
-    }
-
-    .info {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #94a3b8;
-    }
-
-    .footer {
-      margin-top: 15px;
-      font-size: 11px;
-      color: #64748b;
-    }
-  </style>
+.counter {
+  margin-top:15px;
+  font-size:13px;
+  color:#94a3b8;
+}
+</style>
 
 </head>
 
 <body>
-  <div class="container">
+<div class="container">
 
-```
-<!-- Replace with your app logo -->
-<img src="icon.png" class="logo" alt="App Logo">
+<img src="icon.png" class="logo">
 
-<h1>My Mobile App</h1>
-<p>Fast, simple, and powerful. Download now and get started.</p>
+<h2>My App</h2>
 
-<!-- 🔥 PUT YOUR APK LINK HERE -->
-<a href="YOUR_APK_LINK_HERE" class="download-btn">
-  Download APK
-</a>
+<button onclick="handleDownload()" id="btn">Loading...</button>
 
-<div class="info">
-  Android only • Safe download
+<div id="msg"></div>
+
+<div class="carousel" id="carousel"></div>
+
+<div class="counter" id="counter">Downloads: ...</div>
+
 </div>
 
-<div class="footer">
-  Version 1.0.0
-</div>
-```
+<script>
+// 🔥 CONFIG
+const repo = "Merrickal/YOUR_REPO_NAME";
+const APP_SCHEME = "myapp://"; // change this later
 
-  </div>
+let apkUrl = "";
+
+// FETCH APK
+async function fetchAPK(){
+  const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+  const data = await res.json();
+  const apk = data.assets.find(a=>a.name.endsWith(".apk"));
+  apkUrl = apk.browser_download_url;
+  document.getElementById("btn").innerText = "Download APK";
+}
+fetchAPK();
+
+// DEVICE DETECT
+const ua = navigator.userAgent.toLowerCase();
+const msg = document.getElementById("msg");
+
+if(/android/.test(ua)){
+  msg.innerText="Android detected";
+}else if(/iphone|ipad/.test(ua)){
+  msg.innerText="Not available on iOS";
+}else{
+  msg.innerText="Use phone or scan QR";
+}
+
+// 🔥 OPEN APP OR DOWNLOAD
+function handleDownload(){
+  // try open app
+  window.location = APP_SCHEME;
+
+  // fallback download
+  setTimeout(()=>{
+    window.location = apkUrl;
+    incrementDownload();
+  },1500);
+}
+
+// SCREENSHOTS AUTO LOAD
+const carousel = document.getElementById("carousel");
+for(let i=1;i<=5;i++){
+  let img=document.createElement("img");
+  img.src=`screenshots/${i}.png`;
+  carousel.appendChild(img);
+}
+
+// ---------------- FIREBASE ----------------
+
+// ⚠️ PUT YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_ID"
+};
+
+// INIT
+import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js")
+.then(({initializeApp})=>{
+  import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
+  .then(({getFirestore,doc,getDoc,setDoc,updateDoc,increment})=>{
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ref = doc(db,"stats","downloads");
+
+    async function loadCount(){
+      const snap = await getDoc(ref);
+      if(snap.exists()){
+        document.getElementById("counter").innerText =
+          "Downloads: " + snap.data().count;
+      }else{
+        await setDoc(ref,{count:0});
+      }
+    }
+
+    window.incrementDownload = async function(){
+      await updateDoc(ref,{count:increment(1)});
+      loadCount();
+    }
+
+    loadCount();
+
+  });
+});
+</script>
+
 </body>
 </html>
