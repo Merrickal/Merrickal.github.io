@@ -1,16 +1,117 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Download My App</title>
+
+  <!-- Google Font -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #cbd5f5;
+      margin-bottom: 25px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      padding: 14px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: white;
+      text-decoration: none;
+      transition: 0.3s ease;
+      box-shadow: 0 5px 20px rgba(99,102,241,0.4);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(99,102,241,0.6);
+    }
+
+    .info {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .footer {
+      margin-top: 15px;
+      font-size: 11px;
+      color: #64748b;
+    }
+  </style>
+
 </head>
-<body style="text-align:center; font-family:sans-serif;">
-  <h1>My Mobile App</h1>
-  <p>Click below to download</p>
-  
-  <a href="YOUR_APK_LINK_HERE">
-    <button style="padding:15px; font-size:18px;">
-      Download APK
-    </button>
-  </a>
+
+<body>
+  <div class="container">
+
+```
+<!-- Replace with your app logo -->
+<img src="https://via.placeholder.com/100" class="logo" alt="App Logo">
+
+<h1>My Mobile App</h1>
+<p>Fast, simple, and powerful. Download now and get started.</p>
+
+<!-- 🔥 PUT YOUR APK LINK HERE -->
+<a href="YOUR_APK_LINK_HERE" class="download-btn">
+  Download APK
+</a>
+
+<div class="info">
+  Android only • Safe download
+</div>
+
+<div class="footer">
+  Version 1.0.0
+</div>
+```
+
+  </div>
 </body>
 </html>
