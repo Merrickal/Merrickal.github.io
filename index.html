@@ -39,24 +39,62 @@ button {
   color:white;
   font-size:16px;
   margin-top:10px;
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:0.6;
+}
+
+/* 🔥 CAROUSEL */
+.carousel-wrapper {
+  position: relative;
+  margin-top: 20px;
 }
 
 .carousel {
-  display:flex;
-  overflow-x:auto;
-  gap:10px;
-  margin-top:20px;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  transition: transform 0.5s ease;
 }
 
 .carousel img {
-  width:200px;
-  border-radius:12px;
+  width: 70%;
+  max-width: 180px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.left { left: -10px; }
+.right { right: -10px; }
 
 .counter {
   margin-top:15px;
   font-size:13px;
   color:#94a3b8;
+}
+
+#msg {
+  margin-top:10px;
+  font-size:13px;
 }
 </style>
 
@@ -69,11 +107,19 @@ button {
 
 <h2>My App</h2>
 
-<button onclick="handleDownload()" id="btn">Loading...</button>
+<button onclick="handleDownload()" id="btn" disabled>Loading...</button>
 
 <div id="msg"></div>
 
-<div class="carousel" id="carousel"></div>
+<!-- 🔥 CAROUSEL -->
+
+<div class="carousel-wrapper">
+  <button class="arrow left" onclick="prevSlide()">❮</button>
+  <div class="carousel">
+    <div class="carousel-track" id="track"></div>
+  </div>
+  <button class="arrow right" onclick="nextSlide()">❯</button>
+</div>
 
 <div class="counter" id="counter">Downloads: ...</div>
 
@@ -81,18 +127,30 @@ button {
 
 <script>
 // 🔥 CONFIG
-const repo = "Merrickal/YOUR_REPO_NAME";
-const APP_SCHEME = "myapp://"; // change this later
-
+const repo = "Merrickal/ToolsManual";
+const APP_SCHEME = "myapp://";
 let apkUrl = "";
 
 // FETCH APK
 async function fetchAPK(){
-  const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
-  const data = await res.json();
-  const apk = data.assets.find(a=>a.name.endsWith(".apk"));
-  apkUrl = apk.browser_download_url;
-  document.getElementById("btn").innerText = "Download APK";
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+    if(!res.ok) throw new Error();
+
+    const data = await res.json();
+    const apk = data.assets.find(a=>a.name.endsWith(".apk"));
+
+    if(!apk) throw new Error();
+
+    apkUrl = apk.browser_download_url;
+
+    const btn = document.getElementById("btn");
+    btn.innerText = "Download APK";
+    btn.disabled = false;
+
+  } catch {
+    document.getElementById("btn").innerText = "APK not available";
+  }
 }
 fetchAPK();
 
@@ -101,43 +159,63 @@ const ua = navigator.userAgent.toLowerCase();
 const msg = document.getElementById("msg");
 
 if(/android/.test(ua)){
-  msg.innerText="Android detected";
+  msg.innerText="Android device detected";
 }else if(/iphone|ipad/.test(ua)){
   msg.innerText="Not available on iOS";
 }else{
-  msg.innerText="Use phone or scan QR";
+  msg.innerText="Use your phone to install the app";
 }
 
 // 🔥 OPEN APP OR DOWNLOAD
 function handleDownload(){
-  // try open app
   window.location = APP_SCHEME;
 
-  // fallback download
   setTimeout(()=>{
-    window.location = apkUrl;
-    incrementDownload();
+    if(apkUrl){
+      window.location = apkUrl;
+      incrementDownload();
+    }
   },1500);
 }
 
-// SCREENSHOTS AUTO LOAD
-const carousel = document.getElementById("carousel");
-for(let i=1;i<=5;i++){
+// 🔥 CAROUSEL
+const track = document.getElementById("track");
+let index = 0;
+let total = 5;
+
+for(let i=1;i<=total;i++){
   let img=document.createElement("img");
   img.src=`${i}.jpg`;
-  carousel.appendChild(img);
+  track.appendChild(img);
 }
 
-// ---------------- FIREBASE ----------------
+function updateSlide(){
+  const width = track.children[0].offsetWidth + 12;
+  track.style.transform = `translateX(-${index * width}px)`;
+}
 
-// ⚠️ PUT YOUR FIREBASE CONFIG HERE
+function nextSlide(){
+  index = (index < total - 2) ? index + 1 : 0;
+  updateSlide();
+}
+
+function prevSlide(){
+  index = (index > 0) ? index - 1 : total - 2;
+  updateSlide();
+}
+
+let auto = setInterval(nextSlide, 3000);
+
+track.addEventListener("mouseenter", ()=> clearInterval(auto));
+track.addEventListener("mouseleave", ()=> auto = setInterval(nextSlide, 3000));
+
+// ---------------- FIREBASE ----------------
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
   projectId: "YOUR_ID"
 };
 
-// INIT
 import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js")
 .then(({initializeApp})=>{
   import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
