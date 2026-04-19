@@ -231,12 +231,17 @@ import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js")
       }
     }
 
-    window.incrementDownload = async function(){
+  window.incrementDownload = async function(){
+    console.log("Incrementing...");
+    try {
       await updateDoc(ref,{count:increment(1)});
+      console.log("Success");
       loadCount();
-    }
+    } catch(e){
+      console.error("Error:", e);
+      }
+  }
 
-    loadCount();
 
   });
 });
