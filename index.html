@@ -162,7 +162,12 @@ function handleDownload(){
   setTimeout(()=>{
     if(apkUrl){
       window.location = apkUrl;
-      incrementDownload();
+
+      if (typeof incrementDownload === "function") {
+        incrementDownload();
+      } else {
+        console.log("Firebase not ready yet");
+      }
     }
   },1500);
 }
