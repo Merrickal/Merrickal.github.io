@@ -46,7 +46,7 @@ button:disabled {
   opacity:0.6;
 }
 
-/* 🔥 CAROUSEL */
+/* CAROUSEL */
 .carousel-wrapper {
   position: relative;
   margin-top: 20px;
@@ -67,7 +67,6 @@ button:disabled {
   max-width: 180px;
   border-radius: 14px;
   flex-shrink: 0;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
 
 .arrow {
@@ -91,11 +90,6 @@ button:disabled {
   font-size:13px;
   color:#94a3b8;
 }
-
-#msg {
-  margin-top:10px;
-  font-size:13px;
-}
 </style>
 
 </head>
@@ -111,8 +105,6 @@ button:disabled {
 
 <div id="msg"></div>
 
-<!-- 🔥 CAROUSEL -->
-
 <div class="carousel-wrapper">
   <button class="arrow left" onclick="prevSlide()">❮</button>
   <div class="carousel">
@@ -126,9 +118,7 @@ button:disabled {
 </div>
 
 <script>
-  import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// 🔥 CONFIG
+// CONFIG
 const repo = "Merrickal/ToolsManual";
 const APP_SCHEME = "myapp://";
 let apkUrl = "";
@@ -137,15 +127,12 @@ let apkUrl = "";
 async function fetchAPK(){
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
-    if(!res.ok) throw new Error();
-
     const data = await res.json();
-    const apk = data.assets.find(a=>a.name.endsWith(".apk"));
+    const apk = data.assets.find(a=>a.name.toLowerCase().endsWith(".apk"));
 
     if(!apk) throw new Error();
 
     apkUrl = apk.browser_download_url;
-
     const btn = document.getElementById("btn");
     btn.innerText = "Download APK";
     btn.disabled = false;
@@ -168,7 +155,7 @@ if(/android/.test(ua)){
   msg.innerText="Use your phone to install the app";
 }
 
-// 🔥 OPEN APP OR DOWNLOAD
+// DOWNLOAD
 function handleDownload(){
   window.location = APP_SCHEME;
 
@@ -180,7 +167,7 @@ function handleDownload(){
   },1500);
 }
 
-// 🔥 CAROUSEL
+// CAROUSEL
 const track = document.getElementById("track");
 let index = 0;
 let total = 9;
@@ -188,10 +175,12 @@ let total = 9;
 for(let i=1;i<=total;i++){
   let img=document.createElement("img");
   img.src=`${i}.jpg`;
+  img.loading="lazy";
   track.appendChild(img);
 }
 
 function updateSlide(){
+  if(!track.children.length) return;
   const width = track.children[0].offsetWidth + 12;
   track.style.transform = `translateX(-${index * width}px)`;
 }
@@ -211,32 +200,17 @@ let auto = setInterval(nextSlide, 3000);
 track.addEventListener("mouseenter", ()=> clearInterval(auto));
 track.addEventListener("mouseleave", ()=> auto = setInterval(nextSlide, 3000));
 
-// ---------------- FIREBASE ----------------
-// Import the functions you need from the SDKs you need
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBF6kER7C-IeEleZdwvC4E1KvXWytQsDWc",
-  authDomain: "technical-manuel.firebaseapp.com",
-  projectId: "technical-manuel",
-  storageBucket: "technical-manuel.firebasestorage.app",
-  messagingSenderId: "192675967998",
-  appId: "1:192675967998:web:71599c243a90a42c6ac6af",
-  measurementId: "G-532BB82RKX"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-import("https://www.gstatic.com/js/10.12.2/-app.js")
+// FIREBASE (correct version)
+import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js")
 .then(({initializeApp})=>{
   import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
   .then(({getFirestore,doc,getDoc,setDoc,updateDoc,increment})=>{
+
+    const firebaseConfig = {
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_DOMAIN",
+      projectId: "YOUR_ID"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -247,7 +221,7 @@ import("https://www.gstatic.com/js/10.12.2/-app.js")
       if(snap.exists()){
         document.getElementById("counter").innerText =
           "Downloads: " + snap.data().count;
-      }else{
+      } else {
         await setDoc(ref,{count:0});
       }
     }
